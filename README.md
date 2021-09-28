@@ -169,7 +169,6 @@ may be your best choice.
 The good thing about this app is that it doesn't get in the way. It is [easy and quick to install](https://github.com/soynatan/django-easy-audit/wiki/Installation), and it
 begins logging everything right away, without you having to inject code anywhere in your project.
 
-## Contact
 
-Find me on Twitter at [@soynatan](https://twitter.com/soynatan),
+Find the author on Twitter at [@soynatan](https://twitter.com/soynatan),
 or send me an email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).
