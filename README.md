@@ -169,6 +169,12 @@ may be your best choice.
 The good thing about this app is that it doesn't get in the way. It is [easy and quick to install](https://github.com/soynatan/django-easy-audit/wiki/Installation), and it
 begins logging everything right away, without you having to inject code anywhere in your project.
 
+## Changed I have made
+1. In model_signals.py file making query based on auth_id instead of pk.
+     it was like: ```user = get_user_model().objects.get(pk=user.pk)```
+ 
+      Currently, it is: user = `get_user_model().objects.get(auth_id=user.pk)`
+
 
 Find the author on Twitter at [@soynatan](https://twitter.com/soynatan),
 or send me an email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).
