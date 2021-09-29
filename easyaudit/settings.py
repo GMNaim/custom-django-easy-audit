@@ -115,7 +115,7 @@ LOGIN_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_LOGIN_EVENT_LIST_
 REQUEST_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_REQUEST_EVENT_LIST_FILTER', ['method', 'user', 'datetime', ])
 
 # Search fields configuration
-CRUD_EVENT_SEARCH_FIELDS = getattr(settings, 'DJANGO_EASY_AUDIT_CRUD_EVENT_SEARCH_FIELDS', ['=object_id', 'object_json_repr', ])
+CRUD_EVENT_SEARCH_FIELDS = getattr(settings, 'DJANGO_EASY_AUDIT_CRUD_EVENT_SEARCH_FIELDS', ['=object_id', 'object_json_repr', 'user_ip_address', ])
 LOGIN_EVENT_SEARCH_FIELDS = getattr(settings, 'DJANGO_EASY_AUDIT_LOGIN_EVENT_SEARCH_FIELDS', ['=remote_ip', 'username', ])
 REQUEST_EVENT_SEARCH_FIELDS = getattr(settings, 'DJANGO_EASY_AUDIT_REQUEST_EVENT_SEARCH_FIELDS', ['=remote_ip', 'user__username', 'url', 'query_string', ])
 
