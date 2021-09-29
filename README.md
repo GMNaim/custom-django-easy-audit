@@ -1,11 +1,14 @@
 # custom-django-easy-audit
 
-[![pypi](https://img.shields.io/pypi/v/django-easy-audit.svg)](https://pypi.org/project/django-easy-audit/)
-![PyPI - Django Version](https://img.shields.io/pypi/djversions/django-easy-audit)
+[comment]: <> ([![pypi]&#40;https://img.shields.io/pypi/v/django-easy-audit.svg&#41;]&#40;https://pypi.org/project/django-easy-audit/&#41;)
 
-Custom Django audit log app.
+[comment]: <> (![PyPI - Django Version]&#40;https://img.shields.io/pypi/djversions/django-easy-audit&#41;)
 
+
+Custom Django audit log app. This project is modified based on version `1.3.1.a1`
 This app allows you to keep track of every action taken by your users.
+
+[Latest modified version is: 1.3.1.b1](https://github.com/GMNaim/custom-django-easy-audit)
 
 ## Quickstart
 
@@ -177,7 +180,7 @@ begins logging everything right away, without you having to inject code anywhere
     ```
       Currently, it is: 
     ```python
-             user = get_user_model().objects.get(auth_id=user.pk)
+        user = get_user_model().objects.get(auth_id=user.pk)
     ```
 
 2. For admin users query will be in except block based on pk. Previously it was like,
@@ -193,6 +196,12 @@ begins logging everything right away, without you having to inject code anywhere
       if not user:
           user = None
     ```
-
+3. Storing user ip address in CRUDEvent model for each crud event.
+   Changed files are `models.py`, `utils.py`, `model_signals.py`, and `0016_crudevent_user_ip_address.py`
+   1. Added a field named `user_ip_address` in `CRUDEvent` model.
+   2. Added `0016_crudevent_user_ip_address.py` file in `migrations` directory.
+   3. Create a function named `get_user_ip_address` in `utils.py` file. 
+   4. Passing `user_ip_address` in `audit_logger.crud` function in `model_signals.py` file
+     
 Find the core package author on Twitter at [@soynatan](https://twitter.com/soynatan),
-or send me an email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).
+   or send me an email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).

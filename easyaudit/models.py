@@ -38,6 +38,7 @@ class CRUDEvent(models.Model):
                              db_constraint=False, verbose_name=_('User'))
     user_pk_as_string = models.CharField(max_length=255, null=True, blank=True,
                                          help_text=_('String version of the user pk'), verbose_name=_('User PK as string'))
+    user_ip_address = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('User IP address'))
     datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date time'))
 
     def is_create(self):

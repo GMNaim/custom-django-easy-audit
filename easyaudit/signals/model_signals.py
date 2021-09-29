@@ -13,13 +13,13 @@ from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 
-from easyaudit.middleware.easyaudit import get_current_request, \
-    get_current_user
+from easyaudit.middleware.easyaudit import (get_current_request,
+                                            get_current_user)
 from easyaudit.models import CRUDEvent
-from easyaudit.settings import REGISTERED_CLASSES, UNREGISTERED_CLASSES, \
-    WATCH_MODEL_EVENTS, CRUD_DIFFERENCE_CALLBACKS, LOGGING_BACKEND, \
-    DATABASE_ALIAS
-from easyaudit.utils import get_m2m_field_name, model_delta
+from easyaudit.settings import (REGISTERED_CLASSES, UNREGISTERED_CLASSES,
+                                WATCH_MODEL_EVENTS, CRUD_DIFFERENCE_CALLBACKS, LOGGING_BACKEND,
+                                DATABASE_ALIAS)
+from easyaudit.utils import get_m2m_field_name, model_delta, get_user_ip_address
 
 logger = logging.getLogger(__name__)
 audit_logger = import_string(LOGGING_BACKEND)()
@@ -28,12 +28,12 @@ audit_logger = import_string(LOGGING_BACKEND)()
 def should_audit(instance):
     """Returns True or False to indicate whether the instance
     should be audited or not, depending on the project settings."""
-
+    
     # do not audit any model listed in UNREGISTERED_CLASSES
     for unregistered_class in UNREGISTERED_CLASSES:
         if isinstance(instance, unregistered_class):
             return False
-
+    
     # only audit models listed in REGISTERED_CLASSES (if it's set)
     if len(REGISTERED_CLASSES) > 0:
         for registered_class in REGISTERED_CLASSES:
@@ -41,7 +41,7 @@ def should_audit(instance):
                 break
         else:
             return False
-
+    
     # all good
     return True
 
@@ -52,7 +52,7 @@ def pre_save(sender, instance, raw, using, update_fields, **kwargs):
     if raw:
         # Return if loading Fixtures
         return
-
+    
     try:
         with transaction.atomic(using=using):
             if not should_audit(instance):
@@ -62,19 +62,21 @@ def pre_save(sender, instance, raw, using, update_fields, **kwargs):
             except Exception:
                 # We need a better way for this to work. ManyToMany will fail on pre_save on create
                 return None
-
+            
             # Determine if the instance is a create
             created = instance.pk is None or instance._state.adding
-
+            
             # created or updated?
             if not created:
                 old_model = sender.objects.get(pk=instance.pk)
                 delta = model_delta(old_model, instance)
-                if not delta and getattr(settings, "DJANGO_EASY_AUDIT_CRUD_EVENT_NO_CHANGED_FIELDS_SKIP", False):
+                if not delta and getattr(
+                        settings, "DJANGO_EASY_AUDIT_CRUD_EVENT_NO_CHANGED_FIELDS_SKIP", False
+                        ):
                     return False
                 changed_fields = json.dumps(delta)
                 event_type = CRUDEvent.UPDATE
-
+            
             # user
             try:
                 user = get_current_user()
@@ -84,41 +86,48 @@ def pre_save(sender, instance, raw, using, update_fields, **kwargs):
                 user = get_user_model().objects.filter(pk=user.pk).first()
                 if not user:
                     user = None
-
+            
             if isinstance(user, AnonymousUser):
                 user = None
-
+            
             # callbacks
             kwargs['request'] = get_current_request()  # make request available for callbacks
             create_crud_event = all(
                 callback(instance, object_json_repr, created, raw, using, update_fields, **kwargs)
-                for callback in CRUD_DIFFERENCE_CALLBACKS if callable(callback))
+                for callback in CRUD_DIFFERENCE_CALLBACKS if callable(callback)
+            )
             # create crud event only if all callbacks returned True
             if create_crud_event and not created:
                 c_t = ContentType.objects.get_for_model(instance)
-
+                
                 def crud_flow():
                     try:
                         # atomicity based on the easyaudit database alias
                         with transaction.atomic(using=DATABASE_ALIAS):
-                            crud_event = audit_logger.crud({
-                                'event_type': event_type,
-                                'object_repr': str(instance),
-                                'object_json_repr': object_json_repr,
-                                'changed_fields': changed_fields,
-                                'content_type_id': c_t.id,
-                                'object_id': instance.pk,
-                                'user_id': getattr(user, 'id', None),
-                                'datetime': timezone.now(),
-                                'user_pk_as_string': str(user.pk) if user else user
-                            })
+                            crud_event = audit_logger.crud(
+                                {
+                                    'event_type': event_type,
+                                    'object_repr': str(instance),
+                                    'object_json_repr': object_json_repr,
+                                    'changed_fields': changed_fields,
+                                    'content_type_id': c_t.id,
+                                    'object_id': instance.pk,
+                                    'user_id': getattr(user, 'id', None),
+                                    'user_ip_address': get_user_ip_address(get_current_request()),
+                                    'datetime': timezone.now(),
+                                    'user_pk_as_string': str(user.pk) if user else user
+                                }
+                            )
                     except Exception as e:
                         try:
                             logger.exception(
                                 "easy audit had a pre_save exception on CRUDEvent creation. instance: {}, instance pk: {}".format(
-                                    instance, instance.pk))
+                                    instance, instance.pk
+                                )
+                            )
                         except Exception:
                             pass
+                
                 if getattr(settings, "TEST", False):
                     crud_flow()
                 else:
@@ -132,17 +141,17 @@ def post_save(sender, instance, created, raw, using, update_fields, **kwargs):
     if raw:
         # Return if loading Fixtures
         return
-
+    
     try:
         with transaction.atomic(using=using):
             if not should_audit(instance):
                 return False
             object_json_repr = serializers.serialize("json", [instance])
-
+            
             # created or updated?
             if created:
                 event_type = CRUDEvent.CREATE
-
+            
             # user
             try:
                 user = get_current_user()
@@ -152,41 +161,51 @@ def post_save(sender, instance, created, raw, using, update_fields, **kwargs):
                 user = get_user_model().objects.filter(pk=user.pk).first()
                 if not user:
                     user = None
-
+            
             if isinstance(user, AnonymousUser):
                 user = None
-
+            
             # callbacks
             kwargs['request'] = get_current_request()  # make request available for callbacks
-            create_crud_event = all(callback(instance, object_json_repr,
-                                             created, raw, using, update_fields, **kwargs)
-                                    for callback in CRUD_DIFFERENCE_CALLBACKS
-                                    if callable(callback))
-
+            create_crud_event = all(
+                callback(
+                    instance, object_json_repr,
+                    created, raw, using, update_fields, **kwargs
+                    )
+                for callback in CRUD_DIFFERENCE_CALLBACKS
+                if callable(callback)
+                )
+            
             # create crud event only if all callbacks returned True
             if create_crud_event and created:
                 c_t = ContentType.objects.get_for_model(instance)
-
+                
                 def crud_flow():
                     try:
                         with transaction.atomic(using=DATABASE_ALIAS):
-                            crud_event = audit_logger.crud({
-                                'event_type': event_type,
-                                'object_repr': str(instance),
-                                'object_json_repr': object_json_repr,
-                                'content_type_id': c_t.id,
-                                'object_id': instance.pk,
-                                'user_id': getattr(user, 'id', None),
-                                'datetime': timezone.now(),
-                                'user_pk_as_string': str(user.pk) if user else user
-                            })
+                            crud_event = audit_logger.crud(
+                                {
+                                    'event_type': event_type,
+                                    'object_repr': str(instance),
+                                    'object_json_repr': object_json_repr,
+                                    'content_type_id': c_t.id,
+                                    'object_id': instance.pk,
+                                    'user_id': getattr(user, 'id', None),
+                                    'user_ip_address': get_user_ip_address(get_current_request()),
+                                    'datetime': timezone.now(),
+                                    'user_pk_as_string': str(user.pk) if user else user
+                                }
+                            )
                     except Exception as e:
                         try:
                             logger.exception(
                                 "easy audit had a post_save exception on CRUDEvent creation. instance: {}, instance pk: {}".format(
-                                    instance, instance.pk))
+                                    instance, instance.pk
+                                )
+                            )
                         except Exception:
                             pass
+                
                 if getattr(settings, "TEST", False):
                     crud_flow()
                 else:
@@ -218,12 +237,12 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
         with transaction.atomic(using=using):
             if not should_audit(instance):
                 return False
-
+            
             if action not in ("post_add", "post_remove", "post_clear"):
                 return False
-
+            
             object_json_repr = serializers.serialize("json", [instance])
-
+            
             if reverse:
                 if action == 'post_add':
                     event_type = CRUDEvent.M2M_ADD_REV
@@ -231,15 +250,15 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
                     event_type = CRUDEvent.M2M_REMOVE_REV
                 else:
                     event_type = CRUDEvent.M2M_CHANGE_REV  # just in case
-
+                
                 # add reverse M2M changes to event. must use json lib because
                 # django serializers ignore extra fields.
                 tmp_repr = json.loads(object_json_repr)
-
+                
                 m2m_rev_field = _m2m_rev_field_name(instance._meta.concrete_model, model)
                 related_instances = getattr(instance, m2m_rev_field).all()
                 related_ids = [r.pk for r in related_instances]
-
+                
                 tmp_repr[0]['m2m_rev_model'] = force_text(model._meta)
                 tmp_repr[0]['m2m_rev_pks'] = related_ids
                 tmp_repr[0]['m2m_rev_action'] = action
@@ -251,7 +270,7 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
                     event_type = CRUDEvent.M2M_REMOVE
                 else:
                     event_type = CRUDEvent.M2M_CHANGE  # just in case
-
+            
             # user
             try:
                 user = get_current_user()
@@ -261,34 +280,41 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
                 user = get_user_model().objects.filter(pk=user.pk).first()
                 if not user:
                     user = None
-
+            
             if isinstance(user, AnonymousUser):
                 user = None
             c_t = ContentType.objects.get_for_model(instance)
-
+            
             def crud_flow():
                 try:
-                    changed_fields = json.dumps({get_m2m_field_name(model, instance): list(pk_set)}, cls=DjangoJSONEncoder)
+                    changed_fields = json.dumps(
+                        {get_m2m_field_name(model, instance): list(pk_set)}, cls=DjangoJSONEncoder
+                        )
                     with transaction.atomic(using=DATABASE_ALIAS):
-                        crud_event = audit_logger.crud({
-                            'event_type': event_type,
-                            'object_repr': str(instance),
-                            'object_json_repr': object_json_repr,
-                            'changed_fields': changed_fields,
-                            'content_type_id': c_t.id,
-                            'object_id': instance.pk,
-                            'user_id': getattr(user, 'id', None),
-                            'datetime': timezone.now(),
-                            'user_pk_as_string': str(user.pk) if user else user
-                        })
+                        crud_event = audit_logger.crud(
+                            {
+                                'event_type': event_type,
+                                'object_repr': str(instance),
+                                'object_json_repr': object_json_repr,
+                                'changed_fields': changed_fields,
+                                'content_type_id': c_t.id,
+                                'object_id': instance.pk,
+                                'user_id': getattr(user, 'id', None),
+                                'user_ip_address': get_user_ip_address(get_current_request()),
+                                'datetime': timezone.now(),
+                                'user_pk_as_string': str(user.pk) if user else user
+                            }
+                        )
                 except Exception as e:
                     try:
                         logger.exception(
                             "easy audit had a m2m_changed exception on CRUDEvent creation. instance: {}, instance pk: {}".format(
-                                instance, instance.pk))
+                                instance, instance.pk
+                            )
+                        )
                     except Exception:
                         pass
-
+            
             if getattr(settings, "TEST", False):
                 crud_flow()
             else:
@@ -303,9 +329,9 @@ def post_delete(sender, instance, using, **kwargs):
         with transaction.atomic(using=using):
             if not should_audit(instance):
                 return False
-
+            
             object_json_repr = serializers.serialize("json", [instance])
-
+            
             # user
             try:
                 user = get_current_user()
@@ -315,37 +341,42 @@ def post_delete(sender, instance, using, **kwargs):
                 user = get_user_model().objects.filter(pk=user.pk).first()
                 if not user:
                     user = None
-
+            
             if isinstance(user, AnonymousUser):
                 user = None
             c_t = ContentType.objects.get_for_model(instance)
-
+            
             # object id to be used later
             obj_id = instance.pk
-
+            
             def crud_flow():
                 try:
                     with transaction.atomic(using=DATABASE_ALIAS):
                         # crud event
-                        crud_event = audit_logger.crud({
-                            'event_type': CRUDEvent.DELETE,
-                            'object_repr': str(instance),
-                            'object_json_repr': object_json_repr,
-                            'content_type_id': c_t.id,
-                            'object_id': obj_id,
-                            'user_id': getattr(user, 'id', None),
-                            'datetime': timezone.now(),
-                            'user_pk_as_string': str(user.pk) if user else user
-                        })
-
+                        crud_event = audit_logger.crud(
+                            {
+                                'event_type': CRUDEvent.DELETE,
+                                'object_repr': str(instance),
+                                'object_json_repr': object_json_repr,
+                                'content_type_id': c_t.id,
+                                'object_id': obj_id,
+                                'user_id': getattr(user, 'id', None),
+                                'user_ip_address': get_user_ip_address(get_current_request()),
+                                'datetime': timezone.now(),
+                                'user_pk_as_string': str(user.pk) if user else user
+                            }
+                        )
+                
                 except Exception as e:
                     try:
                         logger.exception(
                             "easy audit had a post_delete exception on CRUDEvent creation. instance: {}, instance pk: {}".format(
-                                instance, instance.pk))
+                                instance, instance.pk
+                            )
+                        )
                     except Exception:
                         pass
-
+            
             if getattr(settings, "TEST", False):
                 crud_flow()
             else:
