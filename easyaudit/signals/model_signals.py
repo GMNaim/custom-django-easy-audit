@@ -338,7 +338,6 @@ def post_delete(sender, instance, using, **kwargs):
             # user
             try:
                 user = get_current_user()
-                print(user)
                 # validate that the user still exists
                 if user:
                     user = get_user_model().objects.get(auth_id=user.pk)

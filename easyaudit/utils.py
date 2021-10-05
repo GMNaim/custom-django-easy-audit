@@ -19,10 +19,6 @@ def get_user_ip_address(request):
         f"user ip from, request.META.get('REMOTE_ADDR'): "
         f"{request.META.get('REMOTE_ADDR')} -------"
         )
-    logger.info(
-        f"user ip from, request.environ['HTTP_X_REAL_IP']: "
-        f"{request.environ['HTTP_X_REAL_IP']}"
-        )
     
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
