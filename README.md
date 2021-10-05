@@ -8,7 +8,7 @@
 Custom Django audit log app. This project is modified based on version `1.3.1.a1`
 This app allows you to keep track of every action taken by your users.
 
-[Latest modified version is: 1.3.1.b2](https://github.com/GMNaim/custom-django-easy-audit)
+[Latest modified version is: 1.3.1.b3](https://github.com/GMNaim/custom-django-easy-audit)
 
 ## Quickstart
 
@@ -186,7 +186,7 @@ project.
 
 ## Changed I have made
 
-1. In model_signals.py file making query based on auth_id instead of pk for non-admin users.
+1. In `model_signals.py` file making query based on `auth_id` instead of `pk` for non-admin users.
    Previously it was like:
      ```python
         user = get_user_model().objects.get(pk=user.pk)
@@ -209,7 +209,7 @@ project.
       if not user:
           user = None
     ```
-3. Storing user ip address in CRUDEvent model for each crud event. Changed files are `models.py`
+3. Storing user ip address in `CRUDEvent` model for each crud event. Changed files are `models.py`
    , `utils.py`, `model_signals.py`, and `0016_crudevent_user_ip_address.py`
     1. Added a field named `user_ip_address` in `CRUDEvent` model.
     2. Added `0016_crudevent_user_ip_address.py` file in `migrations` directory.
@@ -222,6 +222,14 @@ project.
     2. In admin.py file `user_ip_address` field is added in `list_display` and `readonly_fields`
        list.
     3. Removed `changed_fields` field from `exclude` list.
-
+   
+5. Checked the user before accessing and logging user ip address. Changed files are `model_signals.py` and `utils.py`.
+    ```python
+        try:
+            user = get_current_user()
+            # validate that the user still exists
+            if user:
+                user = get_user_model().objects.get(auth_id=user.pk)
+    ```
 Find the core package author on Twitter at [@soynatan](https://twitter.com/soynatan), or send me an
 email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).

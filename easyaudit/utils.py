@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import logging
 from uuid import UUID
 
 from django.conf import settings
@@ -8,9 +9,21 @@ from django.db.models import NOT_PROVIDED, DateTimeField
 from django.utils import timezone
 from django.utils.encoding import smart_text
 
+logger = logging.getLogger(__name__)
 
 def get_user_ip_address(request):
     """ Find user id address from request """
+    logger.info(f"user ip from, request.META.get('HTTP_X_FORWARDED_FOR'): "
+                f"{request.META.get('HTTP_X_FORWARDED_FOR')}")
+    logger.info(
+        f"user ip from, request.META.get('REMOTE_ADDR'): "
+        f"{request.META.get('REMOTE_ADDR')} -------"
+        )
+    logger.info(
+        f"user ip from, request.environ['HTTP_X_REAL_IP']: "
+        f"{request.environ['HTTP_X_REAL_IP']}"
+        )
+    
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
