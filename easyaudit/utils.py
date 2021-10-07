@@ -13,15 +13,10 @@ logger = logging.getLogger(__name__)
 
 def get_user_ip_address(request):
     """ Find user id address from request """
-    logger.info(f"user ip from, request.META.get('HTTP_X_FORWARDED_FOR'): "
-                f"{request.META.get('HTTP_X_FORWARDED_FOR')}")
-    logger.info(
-        f"user ip from, request.META.get('REMOTE_ADDR'): "
-        f"{request.META.get('REMOTE_ADDR')} -------"
-        )
-    
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
+        logger.info(f"user ip from, request.META.get('HTTP_X_FORWARDED_FOR'): {x_forwarded_for}")
+        logger.info(f"user ip from, request.META.get('REMOTE_ADDR'): {request.META.get('REMOTE_ADDR')}")
         ip = x_forwarded_for.split(',')[0]
     else:
         ip = request.META.get('REMOTE_ADDR')
