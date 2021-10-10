@@ -8,7 +8,7 @@
 Custom Django audit log app. This project is modified based on version `1.3.1.a1`
 This app allows you to keep track of every action taken by your users.
 
-[Latest modified version is: 1.3.1.b5](https://github.com/GMNaim/custom-django-easy-audit)
+[Latest modified version is: 1.3.1.c1](https://github.com/GMNaim/custom-django-easy-audit)
 
 ## Quickstart
 
@@ -232,6 +232,6 @@ project.
                 user = get_user_model().objects.get(auth_id=user.pk)
     ```
 6. Checked user before accessing in except block in `model_signals.py` file.
-
+7. Processing of finding user ip enclosed in try except block. Modified file is `utils.py` in `get_user_ip_address` function
 Find the core package author on Twitter at [@soynatan](https://twitter.com/soynatan), or send me an
 email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).
