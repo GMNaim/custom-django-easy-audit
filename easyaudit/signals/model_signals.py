@@ -81,9 +81,11 @@ def pre_save(sender, instance, raw, using, update_fields, **kwargs):
             try:
                 user = get_current_user()
                 # validate that the user still exists
+                logger.info(f"USER: {user}")
                 if user:
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
+                logger.info(f"USER: {user}")
                 if not user:
                     user = None
                 else:
@@ -166,9 +168,11 @@ def post_save(sender, instance, created, raw, using, update_fields, **kwargs):
                 #     user = None
                 
                 # validate that the user still exists
+                logger.info(f"USER: {user}")
                 if user:
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
+                logger.info(f"USER: {user}")
                 if not user:
                     user = None
                 else:
@@ -287,9 +291,11 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
             try:
                 user = get_current_user()
                 # validate that the user still exists
+                logger.info(f"USER: {user}")
                 if user:
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
+                logger.info(f"USER: {user}")
                 if not user:
                     user = None
                 else:
@@ -350,9 +356,11 @@ def post_delete(sender, instance, using, **kwargs):
             try:
                 user = get_current_user()
                 # validate that the user still exists
+                logger.info(f"USER: {user}")
                 if user:
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
+                logger.info(f"USER: {user}")
                 if not user:
                     user = None
                 else:
