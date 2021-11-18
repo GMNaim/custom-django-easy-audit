@@ -8,7 +8,7 @@
 Custom Django audit log app. This project is modified based on version `1.3.1.a1`
 This app allows you to keep track of every action taken by your users.
 
-[Latest modified version is: 1.3.1.d2](https://github.com/GMNaim/custom-django-easy-audit)
+[Latest modified version is: 1.3.1.d3](https://github.com/GMNaim/custom-django-easy-audit)
 
 ## Quickstart
 
@@ -236,6 +236,7 @@ project.
 8. Added logger to see user in `model_signals.py` file.
 9. Checking user before accessing user object in `model_signals.py` file.
 10. Added logger to check user value and type in `model_signals.py` file.
+11. Removed testing logging from `model_signals.py` and `utils.py` files.
 
 Find the core package author on Twitter at [@soynatan](https://twitter.com/soynatan), or send me an
 email to [natancalzolari@gmail.com](mailto:natancalzolari@gmail.com).

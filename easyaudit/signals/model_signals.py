@@ -95,19 +95,19 @@ def pre_save(sender, instance, raw, using, update_fields, **kwargs):
             #     user = None
               
                 # validate that the user still exists
-                logger.info(f"get_current_user:{get_current_user()}")
-                logger.info(f"USER: {user}")
+                # logger.info(f"get_current_user:{get_current_user()}")
+                # logger.info(f"USER: {user}")
                 if user:
-                    logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
-                logger.info(f"get_current_user in except:{get_current_user()}")
-                logger.info(f"USER: {user}")
+                # logger.info(f"get_current_user in except:{get_current_user()}")
+                # logger.info(f"USER: {user}")
                 if not user:
-                    logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
                     user = None
                 else:
-                    logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.filter(pk=user.pk).first()
             
             if isinstance(user, AnonymousUser):
@@ -193,18 +193,18 @@ def post_save(sender, instance, created, raw, using, update_fields, **kwargs):
             #     user = None
                 
                 # validate that the user still exists
-                logger.info(f"get_current_user:{get_current_user()}")
-                logger.info(f"USER: {user}")
+                # logger.info(f"get_current_user:{get_current_user()}")
+                # logger.info(f"USER: {user}")
                 if user:
-                    logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
-                logger.info(f"USER: {user}")
+                # logger.info(f"USER: {user}")
                 if not user:
-                    logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
                     user = None
                 else:
-                    logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.filter(pk=user.pk).first()
             
             if isinstance(user, AnonymousUser):
@@ -334,18 +334,18 @@ def m2m_changed(sender, instance, action, reverse, model, pk_set, using, **kwarg
             #     user = None
        
                 # validate that the user still exists
-                logger.info(f"get_current_user:{get_current_user()}")
-                logger.info(f"USER: {user}")
+                # logger.info(f"get_current_user:{get_current_user()}")
+                # logger.info(f"USER: {user}")
                 if user:
-                    logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
-                logger.info(f"USER: {user}")
+                # logger.info(f"USER: {user}")
                 if not user:
-                    logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
                     user = None
                 else:
-                    logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.filter(pk=user.pk).first()
             
             if isinstance(user, AnonymousUser):
@@ -417,18 +417,18 @@ def post_delete(sender, instance, using, **kwargs):
             #     user = None
                 
                 # validate that the user still exists
-                logger.info(f"get_current_user:{get_current_user()}")
-                logger.info(f"USER: {user}")
+                # logger.info(f"get_current_user:{get_current_user()}")
+                # logger.info(f"USER: {user}")
                 if user:
-                    logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN IF::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.get(auth_id=user.pk)
             except:
-                logger.info(f"USER: {user}")
+                # logger.info(f"USER: {user}")
                 if not user:
-                    logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except IF not USER::: {user}....TYPE::: {type(user)}")
                     user = None
                 else:
-                    logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
+                    # logger.info(f"USER IN Except ELSE not USER::: {user}....TYPE::: {type(user)}")
                     user = get_user_model().objects.filter(pk=user.pk).first()
             
             if isinstance(user, AnonymousUser):
