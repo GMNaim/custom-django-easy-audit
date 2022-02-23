@@ -8,7 +8,7 @@
 Custom Django audit log app. This project is modified based on version `1.3.1.a1`
 This app allows you to keep track of every action taken by your users.
 
-[Latest modified version is: 1.3.1.d3](https://github.com/GMNaim/custom-django-easy-audit)
+[Latest modified version is: 1.3.1.d4](https://github.com/GMNaim/custom-django-easy-audit)
 
 ## Quickstart
 

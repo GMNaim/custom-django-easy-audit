@@ -110,9 +110,9 @@ CRUD_EVENT_NO_CHANGED_FIELDS_SKIP = getattr(settings, "DJANGO_EASY_AUDIT_CRUD_EV
 TRUNCATE_TABLE_SQL_STATEMENT = getattr(settings, 'DJANGO_EASY_AUDIT_TRUNCATE_TABLE_SQL_STATEMENT', '')
 
 # Changeview filters configuration
-CRUD_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_CRUD_EVENT_LIST_FILTER', ['event_type', 'content_type', 'user', 'datetime', ])
+CRUD_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_CRUD_EVENT_LIST_FILTER', ['event_type', 'content_type', 'datetime', ])
 LOGIN_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_LOGIN_EVENT_LIST_FILTER', ['login_type', 'user', 'datetime', ])
-REQUEST_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_REQUEST_EVENT_LIST_FILTER', ['method', 'user', 'datetime', ])
+REQUEST_EVENT_LIST_FILTER = getattr(settings, 'DJANGO_EASY_AUDIT_REQUEST_EVENT_LIST_FILTER', ['method', 'datetime', ])
 
 # Search fields configuration
 CRUD_EVENT_SEARCH_FIELDS = getattr(settings, 'DJANGO_EASY_AUDIT_CRUD_EVENT_SEARCH_FIELDS', ['=object_id', 'object_json_repr', 'user_ip_address', ])
